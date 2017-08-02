@@ -1,0 +1,8 @@
+---
+# vars file for acbuild
+acbuild_name: acbuild-{{acbuild_ver}}
+acbuild_tgz: '{{acbuild_name}}.tar.gz'
+acbuild_tgz_url: '{{acbuild_mirror}}/{{acbuild_ver}}/{{acbuild_tgz}}'
+
+acbuild_install_dir: '{{acbuild_parent_install_dir}}/{{acbuild_name}}'
+acbuild_link_dir: '{{acbuild_parent_install_dir}}/acbuild'

@@ -1,0 +1,9 @@
+---
+# defaults file for acbuild
+acbuild_ver: v0.4.0
+acbuild_checksum: sha256:70547b27e8a94a9a73a9bbb86ace163b3866fe9f767ef2edc9d32371c4dcd787
+acbuild_mirror: https://github.com/containers/build/releases/download
+
+acbuild_parent_install_dir: /usr/local
+
+acbuild_cleanup: False
