@@ -1,28 +1,41 @@
 ---
-- name: download...
+- name: check for install
   become: yes
-  become_user: root
-  get_url:
-    url: '{{acbuild_tgz_url}}'
-    dest: /tmp/{{acbuild_tgz}}
-    mode: 0644
-    checksum: '{{acbuild_checksum}}'
-
-- name: unarchive...
-  become: yes
-  become_user: root
-  unarchive:
-    remote_src: yes
-    src: /tmp/{{acbuild_tgz}}
-    dest: '{{acbuild_parent_install_dir}}'
-    creates: '{{acbuild_install_dir}}'
-
+  stat:
+    path: '{{ acbuild_install_dir }}'
+  changed_when: False
+  register: acbuild_binary
+- when: not acbuild_binary.stat.exists
+  block:
+    - name: download...
+      become: yes
+      become_user: root
+      get_url:
+        url: '{{ acbuild_tgz_url }}'
+        dest: /tmp/{{ acbuild_tgz }}
+        mode: 0644
+        checksum: '{{ acbuild_checksum }}'
+    - name: unarchive...
+      become: yes
+      become_user: root
+      unarchive:
+        remote_src: yes
+        src: /tmp/{{ acbuild_tgz }}
+        dest: '{{ acbuild_parent_install_dir }}'
+        creates: '{{ acbuild_install_dir }}'
+  always:
+    - name: cleanup
+      become: yes
+      become_user: root
+      file:
+        path: /tmp/{{ acbuild_tgz }}
+        state: absent
 - name: link...
   become: yes
   become_user: root
   file:
-    src: '{{acbuild_install_dir}}'
-    dest: '{{acbuild_link_dir}}'
+    src: '{{ acbuild_install_dir }}'
+    dest: '{{ acbuild_link_dir }}'
     state: link
 
 - name: add to default login shell path
@@ -32,14 +45,6 @@
     - f: acbuild.sh
       d: /etc/profile.d
   template:
-    src: '{{item.f}}.j2'
-    dest: '{{item.d}}/{{item.f}}'
-    mode: '{{item.m|default("0644")}}'
-
-- name: cleanup...
-  become: yes
-  become_user: root
-  when: acbuild_cleanup
-  file:
-    path: /tmp/{{acbuild_tgz}}
-    state: absent
+    src: '{{ item.f }}.j2'
+    dest: '{{ item.d }}/{{ item.f }}'
+    mode: '{{ item.m|default("0644") }}'
